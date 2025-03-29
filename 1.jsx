@@ -17,6 +17,7 @@ function createElement(type, props, ...children) {
     };
   });
 
+  // Otherwise it's a non-terminal / non-text element.
   return {
     type,
     props: {
@@ -44,6 +45,24 @@ function render(element, container) {
   element.props.children.forEach(child => render(child, dom));
   container.appendChild(dom);
 }
+
+let nextUnitOfWork = null;
+function performUnitOfWork(nextUnitOfWork) {
+
+}
+
+function workLoop(deadline) {
+  let shouldYield = false;
+  while (nextUnitOfWork && !shouldYield) {
+    nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
+    shouldYield = deadline.timeRemaining() < 1;
+  }
+
+  requestIdleCallback(workLoop);
+}
+
+// Initiate work loop
+requestIdleCallback(workLoop);
 
 const Neact = {
   createElement,
